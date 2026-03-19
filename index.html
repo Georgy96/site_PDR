@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDR-Мастер | Ремонт вмятин без покраски</title>
+    <!-- Яндекс.Карты API (версия 2.1) -->
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Шапка */
+        .header {
+            background: linear-gradient(135deg, #0b2b44 0%, #123b5e 100%);
+            color: white;
+            padding: 1.2rem 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .logo span {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #b8d1e6;
+            display: block;
+        }
+
+        .contact-header {
+            text-align: right;
+        }
+
+        .contact-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.3rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .contact-header a:hover {
+            color: #facc15;
+        }
+
+        .contact-header p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        /* Герой */
+        .hero {
+            background: #f1f5f9;
+            padding: 2.5rem 0;
+            border-bottom: 1px solid #d9e2ef;
+        }
+
+        .hero .container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-text {
+            flex: 1 1 300px;
+        }
+
+        .hero-text h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0b2b44;
+            margin-bottom: 1rem;
+        }
+
+        .hero-text ul {
+            list-style: none;
+            font-size: 1.2rem;
+        }
+
+        .hero-text li {
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-text li::before {
+            content: "✓";
+            color: #1e7e34;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        .hero-image {
+            flex: 1 1 300px;
+            background: #cbd5e1;
+            border-radius: 28px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .hero-image svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Секция PDR (компактная) */
+        .pdr-section {
+            padding: 3rem 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #0b2b44;
+            margin-bottom: 2.5rem;
+        }
+
+        .pdr-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .pdr-card {
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 1.8rem 1.5rem;
+            flex: 1 1 260px;
+            max-width: 320px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+            border: 1px solid #e9edf3;
+            transition: transform 0.2s;
+        }
+
+        .pdr-card:hover {
+            transform: translateY(-5px);
+            border-color: #b0c9e0;
+        }
+
+        .pdr-card h3 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pdr-card p {
+            color: #2c3f55;
+            margin-bottom: 1rem;
+        }
+
+        .pdr-card ul {
+            list-style: disc inside;
+            color: #2c3f55;
+        }
+
+        .pdr-card li {
+            margin-bottom: 0.3rem;
+        }
+
+        .badge {
+            background: #d1e0f0;
+            color: #0b2b44;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 0.8rem;
+        }
+
+        /* Галерея примеров работ */
+        .gallery {
+            background: #f1f5f9;
+            padding: 3rem 0;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            border: 1px solid #dde3ed;
+            transition: 0.15s;
+        }
+
+        .gallery-item:hover {
+            box-shadow: 0 15px 30px rgba(0,30,60,0.1);
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 180px;
+            background: #b6c9dd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1f3a5f;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* Имитация фото для примера — градиент вместо картинок */
+        .gallery-img:nth-child(1) { background: linear-gradient(145deg, #98aec5, #6c8aa8); }
+        .gallery-img:nth-child(2) { background: linear-gradient(145deg, #b7c7d9, #819ab3); }
+        .gallery-img:nth-child(3) { background: linear-gradient(145deg, #a7bbd0, #5d7fa0); }
+        .gallery-img:nth-child(4) { background: linear-gradient(145deg, #8ea9c4, #4d6f92); }
+
+        .gallery-caption {
+            padding: 1rem;
+            font-weight: 600;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .gallery-caption span {
+            color: #3e5f7a;
+            font-size: 0.9rem;
+            font-weight: 400;
+            display: block;
+        }
+
+        /* Контакты + карта */
+        .contacts {
+            padding: 3rem 0;
+            background: white;
+        }
+
+        .contacts-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .contact-info {
+            flex: 1 1 280px;
+            background: #f0f5fb;
+            border-radius: 28px;
+            padding: 2rem 1.8rem;
+        }
+
+        .contact-info h3 {
+            font-size: 1.8rem;
+            color: #0b2b44;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-line {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.2rem;
+            font-size: 1.15rem;
+        }
+
+        .info-line a {
+            color: #1e293b;
+            text-decoration: none;
+            border-bottom: 1px dashed #8aa5c0;
+        }
+
+        .info-line a:hover {
+            color: #0057a3;
+            border-bottom: 1px solid #0057a3;
+        }
+
+        .map-container {
+            flex: 2 1 400px;
+            height: 320px;
+            background: #d0deed;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+            border: 1px solid #d2dfee;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Подвал */
+        .footer {
+            background: #0b2b44;
+            color: #afc7df;
+            padding: 1.5rem 0;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Адаптив */
+        @media (max-width: 600px) {
+            .header .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .contact-header {
+                text-align: center;
+            }
+            .hero-text h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ШАПКА -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>DentFree<span>ремонт вмятин без покраски</span></h1>
+            </div>
+            <div class="contact-header">
+                <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+                <p>Москва, ул. Автомобильная, 10</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-text">
+                <h2>PDR — удалим вмятину за час</h2>
+                <ul>
+                    <li>Без шпаклевки и покраски</li>
+                    <li>Сохранение заводского покрытия</li>
+                    <li>От града, ударов, на парковке</li>
+                    <li>Выезд по Москве и области</li>
+                </ul>
+            </div>
+            <div class="hero-image">
+                <!-- просто симпатичный SVG-образ (иконка машины) -->
+                <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="50" width="140" height="40" rx="10" fill="#254e7a" />
+                    <circle cx="55" cy="85" r="18" fill="#1e293b" />
+                    <circle cx="125" cy="85" r="18" fill="#1e293b" />
+                    <rect x="40" y="30" width="100" height="25" rx="6" fill="#3a6792" />
+                    <circle cx="55" cy="85" r="10" fill="#333" />
+                    <circle cx="125" cy="85" r="10" fill="#333" />
+                    <path d="M80 40 L90 30 L110 30 L115 40 L80 40" fill="#f2c94c" />
+                    <rect x="130" y="57" width="18" height="12" rx="3" fill="#c9d9e8" />
+                    <rect x="32" y="57" width="18" height="12" rx="3" fill="#c9d9e8" />
+                    <circle cx="55" cy="85" r="5" fill="#111" />
+                    <circle cx="125" cy="85" r="5" fill="#111" />
+                    <path d="M155 70 L170 70 L165 80 L155 80 Z" fill="#a5b8cf" />
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- КОМПАКТНЫЙ РАЗДЕЛ PDR (описание + преимущества) -->
+    <section class="pdr-section">
+        <div class="container">
+            <h2 class="section-title">Технология PDR — это просто</h2>
+            <div class="pdr-grid">
+                <!-- Карточка 1: что такое PDR -->
+                <div class="pdr-card">
+                    <h3>🔧 PDR</h3>
+                    <p><strong>Paintless Dent Repair</strong> — выравнивание вмятин специальными рычагами и крючками с обратной стороны панели. Без повреждения ЛКП.</p>
+                    <div class="badge">бережно и быстро</div>
+                </div>
+                <!-- Карточка 2: преимущества (компактный список) -->
+                <div class="pdr-card">
+                    <h3>⭐ Преимущества</h3>
+                    <ul>
+                        <li>Сохранение заводской краски</li>
+                        <li>Низкая цена (без маляров)</li>
+                        <li>Скорость: до 2 часов</li>
+                        <li>Экологично, без химии</li>
+                    </ul>
+                </div>
+                <!-- Карточка 3: какие вмятины исправляем -->
+                <div class="pdr-card">
+                    <h3>🎯 Любые случаи</h3>
+                    <ul>
+                        <li>Град, мячики, наледи</li>
+                        <li>Парковочные «тычки»</li>
+                        <li>После ДТП (без заломов)</li>
+                        <li>Хоккейные шайбы</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПРИМЕРЫ РАБОТ -->
+    <section class="gallery">
+        <div class="container">
+            <h2 class="section-title">Примеры работ</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-img">до/после</div>
+                    <div class="gallery-caption">Вмятина на крыле <span>Ford Focus, 45 мин</span></div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img">до/после</div>
+                    <div class="gallery-caption">Град на крыше <span>KIA Rio, 2 часа</span></div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img">до/после</div>
+                    <div class="gallery-caption">Дверь (удар на парковке) <span>Hyundai Solaris</span></div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-img">до/после</div>
+                    <div class="gallery-caption">Сложная линия <span>Mazda CX-5</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- КОНТАКТЫ И КАРТА (ЯНДЕКС) -->
+    <section class="contacts">
+        <div class="container">
+            <h2 class="section-title">Контакты</h2>
+            <div class="contacts-wrapper">
+                <div class="contact-info">
+                    <h3>Свяжитесь с нами</h3>
+                    <div class="info-line">📞 <a href="tel:+79991234567">+7 (999) 123-45-67</a></div>
+                    <div class="info-line">✉️ <a href="mailto:info@pdr-dent.ru">info@pdr-dent.ru</a></div>
+                    <div class="info-line">📍 Москва, ул. Автомобильная, д.10, стр.2</div>
+                    <div class="info-line">🕒 Пн-Сб: 09:00–21:00, Вс: выходной</div>
+                    <div style="margin-top: 20px;"><strong>Работаем с 2015 года</strong>, гарантия на работы.</div>
+                </div>
+                <!-- Контейнер для Яндекс.Карты -->
+                <div class="map-container" id="map"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПОДВАЛ -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 DentFree — профессиональный PDR ремонт. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- СКРИПТ ДЛЯ ЯНДЕКС КАРТЫ -->
+    <script type="text/javascript">
+        ymaps.ready(initMap);
+
+        function initMap() {
+            // координаты центра (пример: Москва, Автомобильная 10)
+            var myMap = new ymaps.Map('map', {
+                center: [55.751574, 37.573856], // заменяем на нужные координаты
+                zoom: 15,
+                controls: ['zoomControl', 'fullscreenControl']
+            });
+
+            // удаляем лишние элементы (как в примере)
+            myMap.controls.remove('searchControl');
+            myMap.controls.remove('trafficControl');
+            myMap.controls.remove('typeSelector');
+
+            // метка (адрес)
+            var myPlacemark = new ymaps.Placemark(
+                [55.751574, 37.573856], 
+                {
+                    hintContent: 'DentFree — ремонт вмятин',
+                    balloonContent: 'ул. Автомобильная, 10<br>+7 (999) 123-45-67'
+                },
+                {
+                    preset: 'islands#redAutomobileIcon',
+                    iconColor: '#1e3a5f'
+                }
+            );
+
+            myMap.geoObjects.add(myPlacemark);
+        }
+    </script>
+    <!-- КОММЕНТАРИЙ: координаты карты указаны приблизительно (центр Москвы). 
+         При необходимости замените center на точные координаты вашей локации. -->
+</body>
+</html>
