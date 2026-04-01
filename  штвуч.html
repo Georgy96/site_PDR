@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PDR Мастер | Ремонт вмятин без покраски</title>
+    <!-- Яндекс.Карты API -->
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background-color: #f9fbfd;
+            color: #1e2a3a;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* шапка */
+        .header {
+            background: linear-gradient(135deg, #0f2b3d 0%, #1a3e57 100%);
+            color: white;
+            padding: 1.2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .logo h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .logo span {
+            font-size: 0.85rem;
+            font-weight: 400;
+            opacity: 0.85;
+            display: block;
+        }
+        .contact-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.4rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .contact-header a:hover { color: #facc15; }
+        .contact-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: right;
+        }
+
+        /* герой */
+        .hero {
+            background: #eef3fc;
+            padding: 2.8rem 0;
+            border-bottom: 1px solid #dce5f0;
+        }
+        .hero-grid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 2rem;
+        }
+        .hero-text {
+            flex: 1 1 320px;
+        }
+        .hero-text h2 {
+            font-size: 2.4rem;
+            color: #0b2b3f;
+            margin-bottom: 1rem;
+        }
+        .hero-text ul {
+            list-style: none;
+            font-size: 1.15rem;
+        }
+        .hero-text li {
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hero-text li::before {
+            content: "✓";
+            color: #1f7b4d;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .hero-svg {
+            flex: 1 1 280px;
+            text-align: center;
+            background: #ffffffc9;
+            border-radius: 42px;
+            padding: 0.8rem;
+        }
+
+        /* секция PDR компактная */
+        .pdr-section {
+            padding: 3rem 0;
+            background: white;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #123e5c;
+            margin-bottom: 2rem;
+        }
+        .pdr-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .pdr-card {
+            background: #f8fafd;
+            border-radius: 28px;
+            padding: 1.8rem;
+            flex: 1 1 260px;
+            border: 1px solid #e2edf7;
+            transition: 0.2s;
+        }
+        .pdr-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: #1c5275;
+        }
+        .pdr-card ul {
+            padding-left: 1.2rem;
+        }
+        .badge-pdr {
+            background: #dceafa;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* ========== ГАЛЕРЕЯ СО СЛАЙДЕРАМИ "ДО/ПОСЛЕ" ========== */
+        .gallery {
+            background: #f1f6fc;
+            padding: 3rem 0;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        .gallery-item {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        .slider-card {
+            padding: 1rem 1rem 0.8rem 1rem;
+        }
+        /* контейнер слайдера до/после */
+        .compare-slider {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: ew-resize;
+            user-select: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .compare-slider img {
+            display: block;
+            width: 100%;
+            height: auto;
+            pointer-events: none;
+        }
+        .img-comp-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .img-comp-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .slider-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.3), 0 0 0 5px rgba(255,255,255,0.7);
+            transform: translateX(-50%);
+            z-index: 10;
+            cursor: ew-resize;
+        }
+        .slider-handle-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 42px;
+            height: 42px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #1e3a5f;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        .gallery-caption {
+            padding: 1rem 1rem 1.2rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-top: 1px solid #eef2f8;
+        }
+        .gallery-caption small {
+            font-weight: normal;
+            color: #54708f;
+            display: block;
+            margin-top: 6px;
+        }
+
+        /* контакты + карта */
+        .contacts {
+            padding: 3rem 0;
+            background: white;
+        }
+        .contacts-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        .contact-info {
+            flex: 1 1 280px;
+            background: #f0f6fe;
+            border-radius: 28px;
+            padding: 2rem;
+        }
+        .info-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            font-size: 1.05rem;
+        }
+        .map-container {
+            flex: 2 1 400px;
+            height: 320px;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid #dde3ec;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        .footer {
+            background: #0f2b3d;
+            color: #bdd4e5;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 0 18px; }
+            .hero-text h2 { font-size: 1.8rem; }
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <h1>Притяжение</h1>
+            <span>PDR — ремонт вмятин без покраски</span>
+        </div>
+        <div class="contact-header">
+            <a href="tel:+79998887766">+7 (999) 888-77-66</a>
+            <p>Москва, ул. Автомобильная 12</p>
+        </div>
+    </div>
+</header>
+
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-text">
+            <h2>Вернём идеальную форму кузову</h2>
+            <ul>
+                <li>Без шпаклёвки и покраски</li>
+                <li>Сохраняем заводской ЛКП</li>
+                <li>Выезд по городу</li>
+                <li>Гарантия до 3 лет</li>
+            </ul>
+        </div>
+        <div class="hero-svg">
+            <svg width="200" height="130" viewBox="0 0 200 130" fill="none">
+                <rect x="20" y="45" width="150" height="45" rx="12" fill="#2c5a7a" />
+                <circle cx="55" cy="85" r="18" fill="#1f2f3c" />
+                <circle cx="135" cy="85" r="18" fill="#1f2f3c" />
+                <path d="M80 35 L92 25 L108 25 L118 35 L80 35" fill="#f3b33d" />
+                <path d="M150 70 L165 70 L160 80 L150 80 Z" fill="#9bb5d0" />
+                <circle cx="55" cy="85" r="9" fill="#111" />
+                <circle cx="135" cy="85" r="9" fill="#111" />
+            </svg>
+        </div>
+    </div>
+</section>
+
+<!-- компактный раздел PDR -->
+<section class="pdr-section">
+    <div class="container">
+        <h2 class="section-title">Технология PDR простыми словами</h2>
+        <div class="pdr-cards">
+            <div class="pdr-card">
+                <h3>🔧 Суть метода</h3>
+                <p>Выравнивание вмятин специальными рычагами с обратной стороны панели. Без сверления, покраски и рихтовки.</p>
+                <div class="badge-pdr">Бережно</div>
+            </div>
+            <div class="pdr-card">
+                <h3>⭐ Преимущества</h3>
+                <ul>
+                    <li>Сохраняется заводская краска</li>
+                    <li>Экономия времени и денег</li>
+                    <li>Экологично, без химии</li>
+                    <li>Подходит для любых марок авто</li>
+                </ul>
+            </div>
+            <div class="pdr-card">
+                <h3>🎯 Какие вмятины</h3>
+                <ul>
+                    <li>Град, наледи, ветки</li>
+                    <li>Парковочные удары</li>
+                    <li>Вмятины от мяча/шайбы</li>
+                    <li>Мелкие повреждения</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ГАЛЕРЕЯ с интерактивными слайдерами ДО/ПОСЛЕ -->
+<section class="gallery">
+    <div class="container">
+        <h2 class="section-title">Примеры работ: двигайте ползунок</h2>
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- каждый элемент галереи будет содержать свой слайдер до/после -->
+            <!-- динамически создадим через JS для удобства и повторного использования,
+                 но можно и статически, однако для наглядности добавим 3 примера через разметку + JS инициализацию -->
+        </div>
+    </div>
+</section>
+
+<!-- КОНТАКТЫ -->
+<section class="contacts">
+    <div class="container">
+        <h2 class="section-title">Контакты и карта</h2>
+        <div class="contacts-wrapper">
+            <div class="contact-info">
+                <h3 style="margin-bottom: 1.2rem;">Свяжитесь с нами</h3>
+                <div class="info-line">📞 <a href="tel:+79998887766" style="color:#1e3a5f;">+7 (999) 888-77-66</a></div>
+                <div class="info-line">✉️ <a href="mailto:pdr@prityazhenie.ru">pdr@prityazhenie.ru</a></div>
+                <div class="info-line">📍 г. Москва, ул. Автомобильная, д.12</div>
+                <div class="info-line">🕒 Ежедневно 09:00 – 21:00</div>
+                <div class="info-line">⭐ Работаем с 2017 года, более 1500 отремонтированных авто</div>
+            </div>
+            <div class="map-container" id="map"></div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">© 2025 Притяжение — профессиональный PDR ремонт вмятин без покраски. Все права защищены.</div>
+</footer>
+
+<script>
+    // --------------------------------------------------------------
+    // 1. Функция инициализации слайдера "До/После" внутри элемента
+    // --------------------------------------------------------------
+    function initCompareSlider(containerElement, beforeSrc, afterSrc) {
+        // очищаем контейнер, но сохраняем структуру
+        containerElement.innerHTML = '';
+        // создаем обертку слайдера
+        const sliderWrapper = document.createElement('div');
+        sliderWrapper.className = 'compare-slider';
+        sliderWrapper.style.position = 'relative';
+        sliderWrapper.style.width = '100%';
+        sliderWrapper.style.cursor = 'ew-resize';
+
+        // изображение "ДО" (фон)
+        const beforeImg = document.createElement('img');
+        beforeImg.src = beforeSrc;
+        beforeImg.alt = 'До ремонта';
+        beforeImg.style.display = 'block';
+        beforeImg.style.width = '100%';
+        beforeImg.style.height = 'auto';
+        beforeImg.style.pointerEvents = 'none';
+
+        // слой "ПОСЛЕ" с перекрытием
+        const overlayDiv = document.createElement('div');
+        overlayDiv.className = 'img-comp-overlay';
+        overlayDiv.style.position = 'absolute';
+        overlayDiv.style.top = '0';
+        overlayDiv.style.left = '0';
+        overlayDiv.style.width = '50%';   // начальная позиция 50%
+        overlayDiv.style.height = '100%';
+        overlayDiv.style.overflow = 'hidden';
+        
+        const afterImg = document.createElement('img');
+        afterImg.src = afterSrc;
+        afterImg.alt = 'После ремонта';
+        afterImg.style.width = '100%';
+        afterImg.style.height = '100%';
+        afterImg.style.objectFit = 'cover';
+        afterImg.style.display = 'block';
+        
+        overlayDiv.appendChild(afterImg);
+        
+        // ползунок
+        const sliderLine = document.createElement('div');
+        sliderLine.className = 'slider-line';
+        const handleIcon = document.createElement('div');
+        handleIcon.className = 'slider-handle-icon';
+        handleIcon.innerHTML = '◀ ▶';
+        sliderLine.appendChild(handleIcon);
+        
+        sliderWrapper.appendChild(beforeImg);
+        sliderWrapper.appendChild(overlayDiv);
+        sliderWrapper.appendChild(sliderLine);
+        containerElement.appendChild(sliderWrapper);
+        
+        // переменные для драга
+        let isDragging = false;
+        
+        function setPosition(percent) {
+            percent = Math.min(100, Math.max(0, percent));
+            overlayDiv.style.width = percent + '%';
+            sliderLine.style.left = percent + '%';
+        }
+        
+        // начальное положение 50%
+        setPosition(50);
+        
+        function onMove(clientX) {
+            if (!isDragging) return;
+            const rect = sliderWrapper.getBoundingClientRect();
+            let x = clientX - rect.left;
+            let percent = (x / rect.width) * 100;
+            percent = Math.min(100, Math.max(0, percent));
+            setPosition(percent);
+        }
+        
+        function startDrag(e) {
+            isDragging = true;
+            e.preventDefault();
+            document.body.style.userSelect = 'none';
+        }
+        
+        function onMouseMove(e) {
+            onMove(e.clientX);
+        }
+        
+        function onTouchMove(e) {
+            if (e.touches.length) {
+                onMove(e.touches[0].clientX);
+                e.preventDefault();
+            }
+        }
+        
+        function stopDrag() {
+            isDragging = false;
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', stopDrag);
+        }
+        
+        sliderLine.addEventListener('mousedown', startDrag);
+        sliderLine.addEventListener('touchstart', startDrag, { passive: false });
+        
+        // также клик по контейнеру для прыжка
+        sliderWrapper.addEventListener('mousedown', function(e) {
+            if (e.target === sliderLine || sliderLine.contains(e.target)) return;
+            const rect = sliderWrapper.getBoundingClientRect();
+            let clickX = e.clientX - rect.left;
+            let percent = (clickX / rect.width) * 100;
+            setPosition(Math.min(100, Math.max(0, percent)));
+        });
+        sliderWrapper.addEventListener('touchstart', function(e) {
+            if (e.target === sliderLine || sliderLine.contains(e.target)) return;
+            const rect = sliderWrapper.getBoundingClientRect();
+            let touchX = e.touches[0].clientX - rect.left;
+            let percent = (touchX / rect.width) * 100;
+            setPosition(Math.min(100, Math.max(0, percent)));
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', stopDrag);
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchend', stopDrag);
+    }
+    
+    // --------------------------------------------------------------
+    // 2. Данные для галереи: примеры работ (пути к картинкам)
+    //    Для демонстрации используем реальные изображения с unsplash/placeholder,
+    //    но стилизованные под авторемонт. Можно заменить на свои фото.
+    //    Здесь для наглядности используем качественные тестовые фото "до/после"
+    //    Специально подобраны фото с вмятинами (имитация) и идеальным результатом
+    // --------------------------------------------------------------
+    const galleryItemsData = [
+        {
+            title: "Вмятина на крыле (Ford Focus)",
+            description: "Удар на парковке",
+            before: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800&h=500&fit=crop&auto=format",  // автомобиль с вмятиной (абстракция)
+            after: "https://images.unsplash.com/photo-1607860106989-3e9c3b9f3b8f?w=800&h=500&fit=crop&auto=format"    // идеальный кузов
+        },
+        {
+            title: "Град на капоте (KIA Rio)",
+            description: "Множественные вмятины после града",
+            before: "https://images.unsplash.com/photo-1593941707882-b5b149fafb31?w=800&h=500&fit=crop&auto=format",
+            after: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&h=500&fit=crop&auto=format"
+        },
+        {
+            title: "Дверь (Hyundai Solaris)",
+            description: "Сильный удар в паркинге",
+            before: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=500&fit=crop&auto=format",
+            after: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&h=500&fit=crop&auto=format"
+        },
+        {
+            title: "Сложная линия крыла (Mazda CX-5)",
+            description: "Вмятина на ребре жесткости",
+            before: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop&auto=format",
+            after: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&h=500&fit=crop&auto=format&sat=-70&bright=105" // условно после
+        }
+    ];
+    
+    // Подготавливаем более реалистичные ссылки для демонстрации: 
+    // поскольку идеальных фото "до/после" может не быть, 
+    // но для примера слайдер работает с любыми картинками.
+    // Чтобы показать разницу, для первого слайда используем отдельные фото (имитация).
+    // В реальности вы замените на свои изображения.
+    
+    // Обновим первый элемент более подходящими тестовыми картинками с явной вмятиной (из открытых источников)
+    // Вместо заглушек используем картинки с явным контрастом: до – вмятина, после – гладкая поверхность.
+    // (Фото с pexels placeholder style но для наглядности создадим условные ссылки на тематику)
+    // Ниже зададим корректные ссылки из надежных источников с автотематикой (car dent before/after style)
+    
+    galleryItemsData[0].before = "https://images.pexels.com/photos/210143/pexels-photo-210143.jpeg?w=800&h=500&fit=crop&auto=compress"; // авто с повреждением
+    galleryItemsData[0].after = "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800&h=500&fit=crop&auto=compress";
+    galleryItemsData[1].before = "https://images.unsplash.com/photo-1562911791-c7a97b729ec5?w=800&h=500&fit=crop";
+    galleryItemsData[1].after = "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&h=500&fit=crop";
+    galleryItemsData[2].before = "https://images.pexels.com/photos/219729/pexels-photo-219729.jpeg?w=800&h=500&fit=crop";
+    galleryItemsData[2].after = "https://images.pexels.com/photos/112460/pexels-photo-112460.jpeg?w=800&h=500&fit=crop";
+    galleryItemsData[3].before = "https://images.pexels.com/photos/102500/pexels-photo-102500.jpeg?w=800&h=500&fit=crop";
+    galleryItemsData[3].after = "https://images.pexels.com/photos/909907/pexels-photo-909907.jpeg?w=800&h=500&fit=crop";
+    
+    // Отрисовываем галерею
+    const galleryGrid = document.getElementById('galleryGrid');
+    galleryItemsData.forEach((item, idx) => {
+        const galleryItem = document.createElement('div');
+        galleryItem.className = 'gallery-item';
+        
+        const sliderCard = document.createElement('div');
+        sliderCard.className = 'slider-card';
+        
+        // контейнер для слайдера
+        const sliderContainer = document.createElement('div');
+        sliderContainer.id = `compare-${idx}`;
+        sliderCard.appendChild(sliderContainer);
+        
+        const captionDiv = document.createElement('div');
+        captionDiv.className = 'gallery-caption';
+        captionDiv.innerHTML = `${item.title} <small>${item.description}</small>`;
+        
+        galleryItem.appendChild(sliderCard);
+        galleryItem.appendChild(captionDiv);
+        galleryGrid.appendChild(galleryItem);
+        
+        // инициализируем слайдер внутри контейнера
+        initCompareSlider(sliderContainer, item.before, item.after);
+    });
+    
+    // Яндекс карта
+    ymaps.ready(initMap);
+    function initMap() {
+        var myMap = new ymaps.Map('map', {
+            center: [55.751574, 37.573856],
+            zoom: 15,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+        myMap.controls.remove('searchControl');
+        myMap.controls.remove('trafficControl');
+        var placemark = new ymaps.Placemark([55.751574, 37.573856], {
+            hintContent: 'Притяжение — PDR ремонт',
+            balloonContent: 'ул. Автомобильная 12<br>+7 (999) 888-77-66'
+        }, {
+            preset: 'islands#redAutomobileIcon'
+        });
+        myMap.geoObjects.add(placemark);
+    }
+    
+    // незначительная корректировка стилей после загрузки
+    window.addEventListener('load', () => {
+        // дополнительная плавность
+        const allSliders = document.querySelectorAll('.compare-slider');
+        allSliders.forEach(sl => {
+            sl.style.touchAction = 'none';
+        });
+    });
+</script>
+</body>
+</html>
